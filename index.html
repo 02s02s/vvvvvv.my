@@ -1,9 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>vvvvvv.my</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vvv</title>
+    <link rel="icon" type="image/png" href="vvv.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: #fafafa;
+            overflow: hidden;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 90px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 60px;
+            z-index: 100;
+            background: rgba(250, 250, 250, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            width: 52px;
+            height: 52px;
+            cursor: pointer;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 45px;
+        }
+
+        .nav-links a {
+            color: #1a1a1a;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.6;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
 </head>
 <body>
-    <h1>hi</h1>
+    <nav>
+        <img src="vvv.png" alt="vvv" class="logo" onclick="window.location.href='index.html'">
+        <div class="nav-links">
+            <a href="about.html">ABOUT</a>
+            <a href="trade.html">TRADE</a>
+        </div>
+    </nav>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const waves = [
+            { offset: 0, amplitude: 100, frequency: 0.012, speed: 0.025, opacity: 0.15, lineWidth: 2 },
+            { offset: 0.5, amplitude: 80, frequency: 0.018, speed: 0.018, opacity: 0.2, lineWidth: 2.5 },
+            { offset: 1, amplitude: 120, frequency: 0.01, speed: 0.03, opacity: 0.12, lineWidth: 1.8 },
+            { offset: 1.5, amplitude: 90, frequency: 0.015, speed: 0.022, opacity: 0.25, lineWidth: 3 },
+            { offset: 2, amplitude: 110, frequency: 0.013, speed: 0.028, opacity: 0.18, lineWidth: 2.2 },
+        ];
+
+        const points = 300;
+
+        function drawWave(wave, yOffset) {
+            const centerY = canvas.height / 2 + yOffset;
+            const startX = 0;
+            const endX = canvas.width;
+            const segmentWidth = endX / points;
+
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0, 0, 0, ${wave.opacity})`;
+            ctx.lineWidth = wave.lineWidth;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            for (let i = 0; i <= points; i++) {
+                const x = startX + (i * segmentWidth);
+                const y = centerY + Math.sin((i * wave.frequency) + wave.offset) * wave.amplitude;
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.stroke();
+        }
+
+        function draw() {
+            ctx.fillStyle = '#fafafa';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            waves.forEach((wave, index) => {
+                const yOffset = (index - 2) * 15;
+                drawWave(wave, yOffset);
+                wave.offset += wave.speed;
+            });
+
+            requestAnimationFrame(draw);
+        }
+
+        draw();
+    </script>
 </body>
 </html>
