@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trade - vvv</title>
+    <title>vvv . trade</title>
     <link rel="icon" type="image/png" href="vvv.png">
     <style>
         * {
@@ -16,6 +16,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
             background: #fafafa;
             color: #1a1a1a;
+            overflow: hidden;
         }
 
         nav {
@@ -23,32 +24,32 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 90px;
+            height: 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 60px;
+            padding: 0 40px;
             z-index: 100;
-            background: rgba(250, 250, 250, 0.95);
+            background: rgba(250, 250, 250, 0.98);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid #e5e5e5;
         }
 
         .logo {
-            width: 52px;
-            height: 52px;
+            width: 38px;
+            height: 38px;
             cursor: pointer;
         }
 
         .nav-links {
             display: flex;
-            gap: 45px;
+            gap: 30px;
         }
 
         .nav-links a {
             color: #1a1a1a;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
             letter-spacing: 0.5px;
             text-transform: uppercase;
@@ -59,33 +60,450 @@
             opacity: 0.6;
         }
 
-        .content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 150px 40px 80px;
+        .ticker-bar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: #fff;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            gap: 40px;
+            z-index: 99;
         }
 
-        h1 {
-            font-size: 48px;
-            font-weight: 400;
-            margin-bottom: 20px;
-            text-align: center;
+        .ticker-item {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
-        .subtitle {
-            text-align: center;
+        .ticker-label {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .ticker-value {
             font-size: 13px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .ticker-value.positive {
+            color: #00c853;
+        }
+
+        .ticker-value.negative {
+            color: #ff3d00;
+        }
+
+        .symbol-selector {
+            position: relative;
+        }
+
+        .symbol-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: background 0.2s;
+        }
+
+        .symbol-name:hover {
+            background: #f5f5f5;
+        }
+
+        .symbol-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            min-width: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            margin-top: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .symbol-dropdown.active {
+            display: block;
+        }
+
+        .symbol-search {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            padding: 10px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .symbol-search input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e5e5e5;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .symbol-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .symbol-option:hover {
+            background: #f5f5f5;
+        }
+
+        .trade-container {
+            display: flex;
+            height: calc(100vh - 110px - 200px);
+            margin-top: 110px;
+        }
+
+        .chart-section {
+            flex: 1;
+            background: #fff;
+            border-right: 1px solid #e5e5e5;
+            position: relative;
+        }
+
+        .chart-section iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .trading-panel {
+            width: 360px;
+            background: #fafafa;
+            padding: 25px;
+            overflow-y: auto;
+        }
+
+        .panel-section {
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-size: 10px;
             color: #666;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 80px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: 500;
         }
 
-        p {
-            font-size: 18px;
-            line-height: 1.8;
-            color: #333;
+        .toggle-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 9px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
             text-align: center;
+        }
+
+        .toggle-btn.active {
+            background: #1a1a1a;
+            color: #fff;
+            border-color: #1a1a1a;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #e5e5e5;
+            font-size: 13px;
+            color: #1a1a1a;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            border-color: #1a1a1a;
+        }
+
+        .leverage-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .leverage-input input {
+            flex: 1;
+        }
+
+        .leverage-input span {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 3px;
+            background: #e5e5e5;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #1a1a1a;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            font-size: 12px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .cost-display {
+            background: #fff;
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            margin-bottom: 15px;
+        }
+
+        .cost-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .cost-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .cost-label {
+            color: #666;
+        }
+
+        .cost-value {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-long, .btn-short {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-long {
+            background: #00c853;
+            color: #fff;
+        }
+
+        .btn-short {
+            background: #ff3d00;
+            color: #fff;
+        }
+
+        .btn-long:hover, .btn-short:hover {
+            opacity: 0.9;
+        }
+
+        .divider {
+            height: 1px;
+            background: #e5e5e5;
+            margin: 20px 0;
+        }
+
+        .positions-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: #fff;
+            border-top: 1px solid #e5e5e5;
+            overflow-y: auto;
+        }
+
+        .positions-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e5e5e5;
+            gap: 20px;
+        }
+
+        .positions-tab {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            padding: 5px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .positions-tab.active {
+            color: #1a1a1a;
+            border-bottom-color: #1a1a1a;
+        }
+
+        .positions-table {
+            width: 100%;
+        }
+
+        .positions-table thead {
+            background: #fafafa;
+        }
+
+        .positions-table th {
+            padding: 10px 20px;
+            text-align: left;
+            font-size: 10px;
+            color: #999;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .positions-table td {
+            padding: 12px 20px;
+            font-size: 12px;
+            color: #1a1a1a;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .position-side {
+            font-weight: 600;
+        }
+
+        .position-side.long {
+            color: #00c853;
+        }
+
+        .position-side.short {
+            color: #ff3d00;
+        }
+
+        .pnl-value.positive {
+            color: #00c853;
+        }
+
+        .pnl-value.negative {
+            color: #ff3d00;
+        }
+
+        .close-btn {
+            padding: 6px 16px;
+            background: #1a1a1a;
+            color: #fff;
+            border: none;
+            font-size: 11px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .close-btn:hover {
+            opacity: 0.8;
+        }
+
+        .empty-positions {
+            padding: 40px;
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .balance-display {
+            background: #fff;
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            margin-bottom: 20px;
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+
+        .balance-row:last-child {
+            margin-bottom: 0;
+            padding-top: 6px;
+            border-top: 1px solid #f5f5f5;
+        }
+
+        .balance-label {
+            color: #666;
+        }
+
+        .balance-value {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .limit-price-input {
+            display: none;
+        }
+
+        .limit-price-input.active {
+            display: block;
         }
     </style>
 </head>
@@ -95,14 +513,659 @@
         <div class="nav-links">
             <a href="about.html">ABOUT</a>
             <a href="trade.html">TRADE</a>
+            <a href="psc.html">PSC</a>
         </div>
     </nav>
 
-    <div class="content">
-        <h1>Trade Simulator</h1>
-        <div class="subtitle">Coming Soon</div>
-
-        <p>Demo Trading</p>
+    <div class="ticker-bar">
+        <div class="symbol-selector">
+            <div class="symbol-name" onclick="window.toggleSymbolDropdown()">
+                <span id="currentSymbol">BTCUSDT</span>
+            </div>
+            <div class="symbol-dropdown" id="symbolDropdown">
+                <div class="symbol-search">
+                    <input type="text" id="symbolSearch" placeholder="search symbols..." oninput="window.filterSymbols()">
+                </div>
+                <div id="symbolList"></div>
+            </div>
+        </div>
+        <div class="ticker-item">
+            <div class="ticker-label">Last Price</div>
+            <div class="ticker-value" id="lastPrice">--</div>
+        </div>
+        <div class="ticker-item">
+            <div class="ticker-label">24h Change</div>
+            <div class="ticker-value" id="change24h">--</div>
+        </div>
+        <div class="ticker-item">
+            <div class="ticker-label">24h High</div>
+            <div class="ticker-value" id="high24h">--</div>
+        </div>
+        <div class="ticker-item">
+            <div class="ticker-label">24h Low</div>
+            <div class="ticker-value" id="low24h">--</div>
+        </div>
+        <div class="ticker-item">
+            <div class="ticker-label">24h Volume</div>
+            <div class="ticker-value" id="volume24h">--</div>
+        </div>
     </div>
+
+    <div class="trade-container">
+        <div class="chart-section">
+            <iframe 
+                id="chartFrame"
+                src="https://www.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3ABTCUSDT&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=light&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en&utm_source=&utm_medium=widget&utm_campaign=chart&utm_term=BINANCE%3ABTCUSDT"
+                frameborder="0"
+                allowtransparency="true"
+                scrolling="no">
+            </iframe>
+        </div>
+
+        <div class="trading-panel">
+            <div class="balance-display">
+                <div class="balance-row">
+                    <span class="balance-label">Balance</span>
+                    <span class="balance-value" id="balanceValue">10,000.00 USDT</span>
+                </div>
+                <div class="balance-row">
+                    <span class="balance-label">Available</span>
+                    <span class="balance-value" id="availableValue">10,000.00 USDT</span>
+                </div>
+                <div class="balance-row">
+                    <span class="balance-label">Total PnL</span>
+                    <span class="balance-value" id="totalPnlValue">0.00 USDT</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="toggle-group">
+                    <div class="toggle-btn active" data-margin="cross">Cross</div>
+                    <div class="toggle-btn" data-margin="isolated">Isolated</div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-label">Leverage</div>
+                <div class="leverage-input">
+                    <input type="number" id="leverage" value="10" min="1" max="100">
+                    <span>x</span>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-label">Order Type</div>
+                <div class="toggle-group" id="orderTypeGroup">
+                    <div class="toggle-btn active" data-order="market">Market</div>
+                    <div class="toggle-btn" data-order="limit">Limit</div>
+                </div>
+            </div>
+
+            <div class="panel-section limit-price-input" id="limitPriceSection">
+                <div class="input-group">
+                    <label class="input-label">Limit Price</label>
+                    <input type="number" id="limitPrice" value="0" step="0.01">
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <div class="input-group">
+                    <label class="input-label">Amount (USDT)</label>
+                    <input type="number" id="amount" value="200" min="0" step="10">
+                </div>
+                <input type="range" id="amountSlider" min="0" max="1000" value="200" step="10">
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="tpsl">
+                <label for="tpsl">TP/SL</label>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="cost-display">
+                <div class="cost-row">
+                    <span class="cost-label">Cost</span>
+                    <span class="cost-value" id="costValue">20.00 USDT</span>
+                </div>
+                <div class="cost-row">
+                    <span class="cost-label">Position Size</span>
+                    <span class="cost-value" id="positionSize">200.00 USDT</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-long" onclick="window.openPosition('long')">Buy Long</button>
+                <button class="btn-short" onclick="window.openPosition('short')">Sell Short</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="positions-panel">
+        <div class="positions-header">
+            <div class="positions-tab active">Positions (<span id="positionsCount">0</span>)</div>
+            <div class="positions-tab">Pending Orders (<span id="ordersCount">0</span>)</div>
+        </div>
+        <div id="positionsContent">
+            <div class="empty-positions">no open positions</div>
+        </div>
+    </div>
+
+    <script>
+        let currentSymbol = 'BTCUSDT';
+        let currentPrice = 0;
+        let tickerData = {};
+        let positions = [];
+        let pendingOrders = [];
+        let ws = null;
+        let balance = 10000;
+        let initialBalance = 10000;
+        let allSymbols = [];
+        let orderType = 'market';
+        let symbolPrices = {};
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('vvv_positions');
+            if (saved) {
+                positions = JSON.parse(saved);
+            }
+            const savedOrders = localStorage.getItem('vvv_pending_orders');
+            if (savedOrders) {
+                pendingOrders = JSON.parse(savedOrders);
+            }
+            const savedBalance = localStorage.getItem('vvv_balance');
+            if (savedBalance) {
+                balance = parseFloat(savedBalance);
+                initialBalance = parseFloat(localStorage.getItem('vvv_initial_balance') || 10000);
+            }
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('vvv_positions', JSON.stringify(positions));
+            localStorage.setItem('vvv_pending_orders', JSON.stringify(pendingOrders));
+            localStorage.setItem('vvv_balance', balance.toString());
+            localStorage.setItem('vvv_initial_balance', initialBalance.toString());
+        }
+
+        async function fetchAllSymbols() {
+            try {
+                const response = await fetch('https://api.bybit.com/v5/market/instruments-info?category=linear');
+                const data = await response.json();
+                
+                if (data.result && data.result.list) {
+                    allSymbols = data.result.list
+                        .filter(item => item.quoteCoin === 'USDT' && item.status === 'Trading')
+                        .map(item => item.symbol)
+                        .sort();
+                    
+                    updateSymbolList(allSymbols);
+                }
+            } catch (error) {
+                console.error('error fetching symbols:', error);
+                allSymbols = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'XRPUSDT'];
+                updateSymbolList(allSymbols);
+            }
+        }
+
+        function updateSymbolList(symbols) {
+            const list = document.getElementById('symbolList');
+            list.innerHTML = symbols.map(sym => 
+                `<div class="symbol-option" onclick="window.changeSymbol('${sym}')">${sym}</div>`
+            ).join('');
+        }
+
+        window.filterSymbols = function() {
+            const search = document.getElementById('symbolSearch').value.toLowerCase();
+            const filtered = allSymbols.filter(s => s.toLowerCase().includes(search));
+            updateSymbolList(filtered);
+        };
+
+        async function fetchTickerData(symbol) {
+            try {
+                const response = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+                const data = await response.json();
+                
+                tickerData = {
+                    lastPrice: parseFloat(data.lastPrice),
+                    priceChangePercent: parseFloat(data.priceChangePercent),
+                    highPrice: parseFloat(data.highPrice),
+                    lowPrice: parseFloat(data.lowPrice),
+                    volume: parseFloat(data.volume)
+                };
+                
+                currentPrice = tickerData.lastPrice;
+                symbolPrices[symbol] = currentPrice;
+                updateTickerDisplay();
+            } catch (error) {
+                console.error('error fetching ticker:', error);
+            }
+        }
+
+        function updateTickerDisplay() {
+            document.getElementById('lastPrice').textContent = formatPrice(tickerData.lastPrice);
+            
+            const changeEl = document.getElementById('change24h');
+            const changePercent = tickerData.priceChangePercent;
+            changeEl.textContent = (changePercent >= 0 ? '+' : '') + changePercent.toFixed(2) + '%';
+            changeEl.className = 'ticker-value ' + (changePercent >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('high24h').textContent = formatPrice(tickerData.highPrice);
+            document.getElementById('low24h').textContent = formatPrice(tickerData.lowPrice);
+            document.getElementById('volume24h').textContent = formatVolume(tickerData.volume);
+        }
+
+        function formatPrice(price) {
+            if (price > 1000) return price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            if (price > 1) return price.toFixed(4);
+            return price.toFixed(6);
+        }
+
+        function formatVolume(vol) {
+            if (vol > 1e9) return (vol / 1e9).toFixed(2) + 'B';
+            if (vol > 1e6) return (vol / 1e6).toFixed(2) + 'M';
+            if (vol > 1e3) return (vol / 1e3).toFixed(2) + 'K';
+            return vol.toFixed(2);
+        }
+
+        function connectWebSocket(symbol) {
+            if (ws) ws.close();
+            
+            const wsSymbol = symbol.toLowerCase();
+            ws = new WebSocket(`wss://stream.binance.com:9443/ws/${wsSymbol}@trade`);
+            
+            ws.onmessage = (event) => {
+                const trade = JSON.parse(event.data);
+                currentPrice = parseFloat(trade.p);
+                tickerData.lastPrice = currentPrice;
+                symbolPrices[symbol] = currentPrice;
+                document.getElementById('lastPrice').textContent = formatPrice(currentPrice);
+                
+                checkPendingOrders();
+                updatePositionsDisplay();
+                updateBalanceDisplay();
+            };
+            
+            ws.onerror = (error) => {
+                console.error('websocket error:', error);
+            };
+        }
+
+        function getActiveSymbols() {
+            const symbols = new Set([currentSymbol]);
+            positions.forEach(pos => symbols.add(pos.symbol));
+            pendingOrders.forEach(order => symbols.add(order.symbol));
+            return Array.from(symbols);
+        }
+
+        async function updateAllActivePrices() {
+            const activeSymbols = getActiveSymbols();
+            
+            for (const symbol of activeSymbols) {
+                if (symbol !== currentSymbol) {
+                    try {
+                        const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
+                        const data = await response.json();
+                        symbolPrices[symbol] = parseFloat(data.price);
+                    } catch (error) {
+                        console.error(`error fetching price for ${symbol}:`, error);
+                    }
+                }
+            }
+        }
+
+        window.toggleSymbolDropdown = function() {
+            const dropdown = document.getElementById('symbolDropdown');
+            dropdown.classList.toggle('active');
+        };
+
+        window.changeSymbol = function(symbol) {
+            currentSymbol = symbol;
+            document.getElementById('currentSymbol').textContent = symbol;
+            document.getElementById('symbolDropdown').classList.remove('active');
+            document.getElementById('symbolSearch').value = '';
+            updateSymbolList(allSymbols);
+            
+            const chartFrame = document.getElementById('chartFrame');
+            chartFrame.src = `https://www.tradingview.com/widgetembed/?frameElementId=tradingview_chart&symbol=BINANCE%3A${symbol}&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=%5B%5D&theme=light&style=1&timezone=Etc%2FUTC&studies_overrides=%7B%7D&overrides=%7B%7D&enabled_features=%5B%5D&disabled_features=%5B%5D&locale=en`;
+            
+            fetchTickerData(symbol);
+            connectWebSocket(symbol);
+        };
+
+        const leverageInput = document.getElementById('leverage');
+        const amountInput = document.getElementById('amount');
+        const amountSlider = document.getElementById('amountSlider');
+        const limitPriceInput = document.getElementById('limitPrice');
+
+        function updateCalculations() {
+            const leverage = parseFloat(leverageInput.value) || 1;
+            const amount = parseFloat(amountInput.value) || 0;
+            
+            const cost = amount / leverage;
+            
+            document.getElementById('costValue').textContent = cost.toFixed(2) + ' USDT';
+            document.getElementById('positionSize').textContent = amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' USDT';
+        }
+
+        leverageInput.addEventListener('input', updateCalculations);
+        amountInput.addEventListener('input', (e) => {
+            amountSlider.value = e.target.value;
+            updateCalculations();
+        });
+        
+        amountSlider.addEventListener('input', (e) => {
+            amountInput.value = e.target.value;
+            updateCalculations();
+        });
+
+        const toggleBtns = document.querySelectorAll('.toggle-btn');
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const parent = this.parentElement;
+                parent.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                if (parent.id === 'orderTypeGroup') {
+                    orderType = this.dataset.order;
+                    const limitSection = document.getElementById('limitPriceSection');
+                    if (orderType === 'limit') {
+                        limitSection.classList.add('active');
+                        limitPriceInput.value = currentPrice.toFixed(2);
+                    } else {
+                        limitSection.classList.remove('active');
+                    }
+                }
+            });
+        });
+
+        window.openPosition = function(side) {
+            const leverage = parseFloat(leverageInput.value) || 1;
+            const amount = parseFloat(amountInput.value) || 0;
+            const cost = amount / leverage;
+
+            if (cost > balance) {
+                alert('insufficient balance');
+                return;
+            }
+
+            if (amount <= 0) {
+                alert('invalid amount');
+                return;
+            }
+
+            if (orderType === 'market') {
+                const position = {
+                    id: Date.now(),
+                    side: side,
+                    symbol: currentSymbol,
+                    entryPrice: currentPrice,
+                    size: amount,
+                    leverage: leverage,
+                    cost: cost,
+                    openTime: new Date().toISOString()
+                };
+
+                positions.push(position);
+                balance -= cost;
+                saveToStorage();
+                updatePositionsDisplay();
+                updatePositionsCount();
+                updateBalanceDisplay();
+            } else {
+                const limitPrice = parseFloat(limitPriceInput.value);
+                if (!limitPrice || limitPrice <= 0) {
+                    alert('invalid limit price');
+                    return;
+                }
+
+                const order = {
+                    id: Date.now(),
+                    side: side,
+                    symbol: currentSymbol,
+                    limitPrice: limitPrice,
+                    size: amount,
+                    leverage: leverage,
+                    cost: cost,
+                    openTime: new Date().toISOString()
+                };
+
+                pendingOrders.push(order);
+                balance -= cost;
+                saveToStorage();
+                updateOrdersDisplay();
+                updateOrdersCount();
+                updateBalanceDisplay();
+            }
+        };
+
+        function checkPendingOrders() {
+            const executed = [];
+            
+            pendingOrders.forEach(order => {
+                const price = symbolPrices[order.symbol] || currentPrice;
+                const shouldExecute = (order.side === 'long' && price <= order.limitPrice) ||
+                                     (order.side === 'short' && price >= order.limitPrice);
+                
+                if (shouldExecute) {
+                    const position = {
+                        id: Date.now() + Math.random(),
+                        side: order.side,
+                        symbol: order.symbol,
+                        entryPrice: order.limitPrice,
+                        size: order.size,
+                        leverage: order.leverage,
+                        cost: order.cost,
+                        openTime: new Date().toISOString()
+                    };
+                    
+                    positions.push(position);
+                    executed.push(order.id);
+                }
+            });
+            
+            if (executed.length > 0) {
+                pendingOrders = pendingOrders.filter(o => !executed.includes(o.id));
+                saveToStorage();
+                updatePositionsDisplay();
+                updateOrdersDisplay();
+                updatePositionsCount();
+                updateOrdersCount();
+            }
+        }
+
+        window.closePosition = function(id) {
+            const position = positions.find(p => p.id === id);
+            if (!position) return;
+
+            const price = symbolPrices[position.symbol] || currentPrice;
+            const pnl = calculatePnL(position, price);
+            balance += position.cost + pnl;
+            
+            positions = positions.filter(p => p.id !== id);
+            saveToStorage();
+            updatePositionsDisplay();
+            updatePositionsCount();
+            updateBalanceDisplay();
+        };
+
+        window.cancelOrder = function(id) {
+            const order = pendingOrders.find(o => o.id === id);
+            if (!order) return;
+
+            balance += order.cost;
+            pendingOrders = pendingOrders.filter(o => o.id !== id);
+            saveToStorage();
+            updateOrdersDisplay();
+            updateOrdersCount();
+            updateBalanceDisplay();
+        };
+
+        function calculatePnL(position, price) {
+            const priceDiff = price - position.entryPrice;
+            const percentChange = (priceDiff / position.entryPrice) * 100;
+            const directionMultiplier = position.side === 'long' ? 1 : -1;
+            const leveragedPercent = percentChange * position.leverage * directionMultiplier;
+            return (position.cost * leveragedPercent) / 100;
+        }
+
+        function updatePositionsDisplay() {
+            const content = document.getElementById('positionsContent');
+            
+            if (positions.length === 0) {
+                content.innerHTML = '<div class="empty-positions">no open positions</div>';
+                return;
+            }
+
+            const tableHTML = `
+                <table class="positions-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Side</th>
+                            <th>Size</th>
+                            <th>Entry Price</th>
+                            <th>Current Price</th>
+                            <th>Leverage</th>
+                            <th>Cost</th>
+                            <th>PnL</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${positions.map(pos => {
+                            const price = symbolPrices[pos.symbol] || currentPrice;
+                            const pnl = calculatePnL(pos, price);
+                            const pnlPercent = (pnl / pos.cost) * 100;
+                            
+                            return `
+                                <tr>
+                                    <td>${pos.symbol}</td>
+                                    <td><span class="position-side ${pos.side}">${pos.side.toUpperCase()}</span></td>
+                                    <td>${pos.size.toFixed(2)} USDT</td>
+                                    <td>${formatPrice(pos.entryPrice)}</td>
+                                    <td>${formatPrice(price)}</td>
+                                    <td>${pos.leverage}x</td>
+                                    <td>${pos.cost.toFixed(2)} USDT</td>
+                                    <td><span class="pnl-value ${pnl >= 0 ? 'positive' : 'negative'}">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} USDT (${pnlPercent >= 0 ? '+' : ''}${pnlPercent.toFixed(2)}%)</span></td>
+                                    <td><button class="close-btn" onclick="window.closePosition(${pos.id})">Close</button></td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            content.innerHTML = tableHTML;
+        }
+
+        function updateOrdersDisplay() {
+            const content = document.getElementById('positionsContent');
+            
+            if (pendingOrders.length === 0) {
+                content.innerHTML = '<div class="empty-positions">no pending orders</div>';
+                return;
+            }
+
+            const tableHTML = `
+                <table class="positions-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Side</th>
+                            <th>Size</th>
+                            <th>Limit Price</th>
+                            <th>Current Price</th>
+                            <th>Leverage</th>
+                            <th>Cost</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${pendingOrders.map(order => {
+                            const price = symbolPrices[order.symbol] || currentPrice;
+                            
+                            return `
+                                <tr>
+                                    <td>${order.symbol}</td>
+                                    <td><span class="position-side ${order.side}">${order.side.toUpperCase()}</span></td>
+                                    <td>${order.size.toFixed(2)} USDT</td>
+                                    <td>${formatPrice(order.limitPrice)}</td>
+                                    <td>${formatPrice(price)}</td>
+                                    <td>${order.leverage}x</td>
+                                    <td>${order.cost.toFixed(2)} USDT</td>
+                                    <td><button class="close-btn" onclick="window.cancelOrder(${order.id})">Cancel</button></td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            content.innerHTML = tableHTML;
+        }
+
+        function updatePositionsCount() {
+            document.getElementById('positionsCount').textContent = positions.length;
+        }
+
+        function updateOrdersCount() {
+            document.getElementById('ordersCount').textContent = pendingOrders.length;
+        }
+
+        function updateBalanceDisplay() {
+            let totalPnL = 0;
+            positions.forEach(pos => {
+                const price = symbolPrices[pos.symbol] || currentPrice;
+                totalPnL += calculatePnL(pos, price);
+            });
+            
+            const lockedInOrders = pendingOrders.reduce((sum, o) => sum + o.cost, 0);
+            const lockedInPositions = positions.reduce((sum, p) => sum + p.cost, 0);
+            const totalValue = balance + lockedInOrders + lockedInPositions + totalPnL;
+            const available = balance;
+
+            document.getElementById('balanceValue').textContent = totalValue.toFixed(2) + ' USDT';
+            document.getElementById('availableValue').textContent = available.toFixed(2) + ' USDT';
+            
+            const totalPnLEl = document.getElementById('totalPnlValue');
+            const overallPnL = totalValue - initialBalance;
+            totalPnLEl.textContent = (overallPnL >= 0 ? '+' : '') + overallPnL.toFixed(2) + ' USDT';
+            totalPnLEl.className = 'balance-value ' + (overallPnL >= 0 ? 'positive' : 'negative');
+        }
+
+        const tabs = document.querySelectorAll('.positions-tab');
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                if (index === 0) {
+                    updatePositionsDisplay();
+                } else {
+                    updateOrdersDisplay();
+                }
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.symbol-selector')) {
+                document.getElementById('symbolDropdown').classList.remove('active');
+            }
+        });
+
+        loadFromStorage();
+        fetchAllSymbols();
+        fetchTickerData(currentSymbol);
+        connectWebSocket(currentSymbol);
+        updateCalculations();
+        updatePositionsDisplay();
+        updatePositionsCount();
+        updateOrdersCount();
+        updateBalanceDisplay();
+
+        setInterval(() => {
+            updateAllActivePrices();
+        }, 3000);
+    </script>
 </body>
 </html>
